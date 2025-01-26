@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using UserManagementAPI.Attributes;
 
-namespace UserManagementAPI.Middleware
+namespace UserManagementAPI.Middlewares
 {
     public class TokenValidationMiddleware
     {
@@ -17,6 +18,16 @@ namespace UserManagementAPI.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+
+             // Check if the endpoint has the SkipAuth attribute
+            var endpoint = context.GetEndpoint();
+            if (endpoint != null && endpoint.Metadata.GetMetadata<SkipAuthAttribute>() != null)
+            {
+                // Skip token validation for endpoints with the SkipAuth attribute
+                await _next(context);
+                return;
+            }
+
             // Apply token validation only for POST, PUT, DELETE requests
             if (context.Request.Method == HttpMethods.Post ||
                 context.Request.Method == HttpMethods.Put ||

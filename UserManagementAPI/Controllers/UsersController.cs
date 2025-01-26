@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UserManagementAPI.Services;
+using UserManagementAPI.Attributes;
 
 namespace UserManagementAPI.Controllers
 {
@@ -23,7 +24,9 @@ namespace UserManagementAPI.Controllers
             _tokenService = tokenService;
         }
 
+
         [HttpPost("login")]
+        [SkipAuth]
         public IActionResult Login([FromBody] User request)
         {
             // Dummy validation logic (replace with actual user authentication)
@@ -73,6 +76,7 @@ namespace UserManagementAPI.Controllers
 
         // POST: api/Users
         [HttpPost]
+        [SkipAuth]
         public async Task<ActionResult<User>> PostUser(User user)
         {
             if (!IsValidUser(user, out string errorMessage))

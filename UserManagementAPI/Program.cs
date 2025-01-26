@@ -30,6 +30,8 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
+app.UseMiddleware<TokenValidationMiddleware>();
+
 app.UseMiddleware<LoggingMiddleware>();
 
 app.UseAuthorization();
