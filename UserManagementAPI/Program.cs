@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UserManagementAPI.Data;
+using UserManagementAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseAuthorization();
 
