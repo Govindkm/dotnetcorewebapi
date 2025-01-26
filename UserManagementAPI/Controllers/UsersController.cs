@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UserManagementAPI.Services;
 
 namespace UserManagementAPI.Controllers
 {
@@ -14,10 +15,25 @@ namespace UserManagementAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserContext _context;
+        private readonly TokenService _tokenService;
 
-        public UsersController(UserContext context)
+        public UsersController(UserContext context, TokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] User request)
+        {
+            // Dummy validation logic (replace with actual user authentication)
+            if (request.Email == "test@abc.com" && request.Password == "password")
+            {
+                var token = _tokenService.GenerateToken(request.Email, "Admin");
+                return Ok(new { Token = token });
+            }
+
+            return Unauthorized("Invalid username or password");
         }
 
         // GET: api/Users

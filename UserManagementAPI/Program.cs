@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UserManagementAPI.Data;
 using UserManagementAPI.Middlewares;
+using UserManagementAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Services.AddSwaggerGen();
 // Configure in-memory database for simplicity.
 builder.Services.AddDbContext<UserContext>(options =>
     options.UseInMemoryDatabase("UserDB"));
+
+builder.Services.AddSingleton<TokenService>();
 
 // Build the app.
 var app = builder.Build();
@@ -26,6 +29,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
+
+app.UseMiddleware<LoggingMiddleware>();
 
 app.UseAuthorization();
 
