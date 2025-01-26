@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserManagementAPI.Data;
 using UserManagementAPI.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace UserManagementAPI.Controllers
 {
@@ -20,7 +21,7 @@ namespace UserManagementAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.AsNoTracking().ToListAsync();
         }
 
         // GET: api/Users/5
@@ -41,6 +42,11 @@ namespace UserManagementAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            if (!IsValidUser(user, out string errorMessage))
+            {
+                return BadRequest(errorMessage);
+            }
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
@@ -51,9 +57,15 @@ namespace UserManagementAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
+
+            if (!IsValidUser(user, out string errorMessage))
+            {
+                return BadRequest(errorMessage);
+            }
+
             if (id != user.Id)
             {
-                return BadRequest();
+                return BadRequest("Invalid user ID.");
             }
 
             _context.Entry(user).State = EntityState.Modified;
@@ -96,6 +108,31 @@ namespace UserManagementAPI.Controllers
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);
+        }
+
+        private bool IsValidUser(User user, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(user.FirstName) || user.FirstName.Length > 50)
+            {
+                errorMessage = "Invalid name. Name cannot be empty and must be less than 50 characters.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(user.LastName) || user.LastName.Length > 50)
+            {
+                errorMessage = "Invalid name. Name cannot be empty and must be less than 50 characters.";
+                return false;
+            }
+
+            if (!new EmailAddressAttribute().IsValid(user.Email))
+            {
+                errorMessage = "Invalid email address.";
+                return false;
+            }
+
+            return true;
         }
     }
 }
